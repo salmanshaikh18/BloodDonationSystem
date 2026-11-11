@@ -22,6 +22,7 @@
 @import "./components/tables.css";
 @import "./components/badges.css";
 @import "./components/chips.css";
+@import "./components/pagination.css";
 @import "./components/alerts.css";
 
 /* Styles used by a single page */

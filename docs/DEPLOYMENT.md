@@ -94,7 +94,7 @@ mvnw.cmd spring-boot:run
 ./mvnw test
 ```
 
-You should see `Tests run: 22, Failures: 0, Errors: 0`.
+You should see `Tests run: 27, Failures: 0, Errors: 0`.
 
 ---
 

@@ -7,6 +7,7 @@ import com.group2.blooddonation.model.Gender;
 import com.group2.blooddonation.service.DonorService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -55,9 +56,14 @@ public class DonorController {
 
     // ----- List and view -----
 
+    /** The donors list, 10 per page: /donors, /donors?page=2, /donors?bloodGroup=O_POSITIVE&page=2 */
     @GetMapping
-    public String list(@RequestParam(required = false) BloodGroup bloodGroup, Model model) {
-        model.addAttribute("donors", donorService.findAll(bloodGroup));
+    public String list(@RequestParam(required = false) BloodGroup bloodGroup,
+                       @RequestParam(defaultValue = "1") int page,
+                       Model model) {
+        Page<Donor> donorPage = donorService.findPage(bloodGroup, page);
+        model.addAttribute("donorPage", donorPage);
+        model.addAttribute("donors", donorPage.getContent());
         model.addAttribute("selectedBloodGroup", bloodGroup);
         return "donors/list";
     }

@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DonorService {
 
+    /** How many donors each page of the donors list shows. */
+    public static final int PAGE_SIZE = 10;
+
+    /** Alphabetical by name, ignoring capital letters. The id breaks ties so pages never overlap. */
+    private static final Sort BY_NAME = Sort.by(Sort.Order.asc("fullName").ignoreCase(), Sort.Order.asc("id"));
+
     private final DonorRepository donorRepository;
 
     public DonorService(DonorRepository donorRepository) {
@@ -34,12 +44,27 @@ public class DonorService {
 
     // ----- Reading -----
 
-    /** All donors sorted by name, or only one blood group when {@code bloodGroup} is given. */
-    public List<Donor> findAll(BloodGroup bloodGroup) {
-        if (bloodGroup == null) {
-            return donorRepository.findAllByOrderByFullNameAsc();
+    /**
+     * One page of the donors list, sorted by name. Page numbers start at 1, as shown on screen.
+     * Only one blood group is listed when {@code bloodGroup} is given.
+     * A number below 1 shows the first page, and a number past the end shows the last page.
+     */
+    public Page<Donor> findPage(BloodGroup bloodGroup, int pageNumber) {
+        // Spring Data counts pages from 0. The upper limit keeps the row offset within an int.
+        int pageIndex = Math.min(Math.max(pageNumber, 1), Integer.MAX_VALUE / PAGE_SIZE) - 1;
+        Page<Donor> page = fetchPage(bloodGroup, pageIndex);
+        if (page.getTotalPages() > 0 && page.getNumber() >= page.getTotalPages()) {
+            page = fetchPage(bloodGroup, page.getTotalPages() - 1);
         }
-        return donorRepository.findByBloodGroupOrderByFullNameAsc(bloodGroup);
+        return page;
+    }
+
+    private Page<Donor> fetchPage(BloodGroup bloodGroup, int pageIndex) {
+        Pageable pageable = PageRequest.of(pageIndex, PAGE_SIZE, BY_NAME);
+        if (bloodGroup == null) {
+            return donorRepository.findAll(pageable);
+        }
+        return donorRepository.findByBloodGroup(bloodGroup, pageable);
     }
 
     public List<Donor> findRecentlyRegistered() {

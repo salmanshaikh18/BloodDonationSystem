@@ -18,6 +18,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,9 +96,45 @@ class DonorServiceTest {
 
     @Test
     void storesBloodGroupAsItsLabel() {
-        assertThat(donorRepository.findByBloodGroupOrderByFullNameAsc(O_NEGATIVE))
+        assertThat(donorRepository.findByBloodGroup(O_NEGATIVE, Pageable.unpaged()).getContent())
                 .extracting(Donor::getFullName)
                 .containsExactly("Bala");
+    }
+
+    // ----- Donors list pages -----
+
+    @Test
+    void listsTenDonorsPerPageSortedByNameIgnoringCapitals() {
+        save("aaron", Gender.MALE, O_NEGATIVE, "9100000000", "Pune", null, true);
+        for (int i = 1; i <= 11; i++) {
+            save(String.format("Zed %02d", i), Gender.MALE, B_POSITIVE, String.format("91000000%02d", i), "Pune", null, true);
+        }
+
+        Page<Donor> firstPage = donorService.findPage(null, 1);
+        assertThat(firstPage.getTotalElements()).isEqualTo(17);
+        assertThat(firstPage.getTotalPages()).isEqualTo(2);
+        assertThat(namesOf(firstPage.getContent()))
+                .hasSize(10)
+                .startsWith("aaron", "Asha", "Bala", "Chetan", "Divya", "Esha", "Zed 01");
+
+        Page<Donor> secondPage = donorService.findPage(null, 2);
+        assertThat(namesOf(secondPage.getContent())).hasSize(7).endsWith("Zed 11");
+    }
+
+    @Test
+    void pagesCanBeFilteredByBloodGroup() {
+        Page<Donor> page = donorService.findPage(A_POSITIVE, 1);
+
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(namesOf(page.getContent())).containsExactly("Asha", "Chetan");
+    }
+
+    @Test
+    void outOfRangePageNumbersShowTheNearestPage() {
+        assertThat(donorService.findPage(null, 0).getNumber()).isZero();
+        assertThat(donorService.findPage(null, -5).getNumber()).isZero();
+        assertThat(donorService.findPage(null, 99).getContent()).hasSize(5);
+        assertThat(donorService.findPage(null, Integer.MAX_VALUE).getContent()).hasSize(5);
     }
 
     // ----- Helpers -----

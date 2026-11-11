@@ -46,7 +46,7 @@ see [DIAGRAMS.md](DIAGRAMS.md).
 | Web server | Embedded Apache Tomcat | 11.0 | Runs inside the app, no separate server needed |
 | Container | Docker | - | Packages the app for Vercel |
 | Hosting | Vercel (Container runtime) | Hobby plan | Free hosting that builds the Dockerfile |
-| Tests | JUnit 5, AssertJ, Spring MockMvc | - | 22 automatic tests |
+| Tests | JUnit 5, AssertJ, Spring MockMvc | - | 27 automatic tests |
 
 ---
 
@@ -154,7 +154,8 @@ BloodDonationSystem/
     │           ├── page.tag                 Shared page layout
     │           ├── blood-group-badge.tag    "A+" pill
     │           ├── availability-badge.tag   "Can donate now" / "Not available" ...
-    │           └── date.tag                 Shows dates as "10 Aug 2026"
+    │           ├── date.tag                 Shows dates as "10 Aug 2026"
+    │           └── pagination.tag           "Showing 1-10 of 12", Previous / Next, page numbers
     │
     └── test/
         ├── java/com/group2/blooddonation/
@@ -172,23 +173,26 @@ Files that are **made by the build** and never edited by hand (all ignored by Gi
 
 ## 4. How a request travels through the code
 
-**Example 1: showing O- donors** (`GET /donors?bloodGroup=O_NEGATIVE`)
+**Example 1: page 2 of the O- donors** (`GET /donors?bloodGroup=O_NEGATIVE&page=2`)
 
 1. **Tomcat** (inside the app) receives the request and gives it to Spring's `DispatcherServlet`.
 2. Spring finds the method mapped to `GET /donors`: `DonorController.list(...)`. It converts
-   the text `O_NEGATIVE` into the enum value `BloodGroup.O_NEGATIVE`.
-3. `list` calls `donorService.findAll(BloodGroup.O_NEGATIVE)`.
-4. The service calls `donorRepository.findByBloodGroupOrderByFullNameAsc(...)`. Spring Data
-   JPA turns that method name into SQL:
+   the text `O_NEGATIVE` into the enum value `BloodGroup.O_NEGATIVE`, and `"2"` into the int `2`.
+3. `list` calls `donorService.findPage(BloodGroup.O_NEGATIVE, 2)`.
+4. The service builds `PageRequest.of(1, 10, sort by name)` (Spring Data counts pages from 0)
+   and calls `donorRepository.findByBloodGroup(...)`. Spring Data JPA turns that into two
+   SQL queries:
    ```sql
-   SELECT * FROM donors WHERE blood_group = 'O-' ORDER BY full_name
+   SELECT * FROM donors WHERE blood_group = 'O-' ORDER BY lower(full_name), id LIMIT 10 OFFSET 10
+   SELECT count(*) FROM donors WHERE blood_group = 'O-'
    ```
    (`BloodGroupConverter` turned `O_NEGATIVE` into `'O-'`.)
-5. Hibernate turns each row into a `Donor` object and returns a `List<Donor>`.
-6. The controller puts the list in the **model** and returns the view name `"donors/list"`.
+5. Hibernate turns each row into a `Donor` object. The result is a `Page<Donor>`: the 10
+   donors plus the page number, total pages and total donors.
+6. The controller puts the page in the **model** and returns the view name `"donors/list"`.
 7. Spring adds the prefix and suffix from `application.properties` and runs
-   `/WEB-INF/jsp/donors/list.jsp`. The JSP loops over the donors with `<c:forEach>` and
-   writes HTML.
+   `/WEB-INF/jsp/donors/list.jsp`. The JSP loops over the donors with `<c:forEach>`, and
+   `<ui:pagination>` writes the "Showing 11–20 of 25" line and the page links.
 8. The browser shows the page and loads `/css/app-<hash>.css` and `/js/app-<hash>.js`.
 
 **Example 2: registering a donor** (`POST /donors`) follows the
@@ -267,13 +271,13 @@ database column holds readable values like `AB+` instead of `AB_POSITIVE`.
 
 **`DonorRepository`** is an **interface** that extends `JpaRepository<Donor, Long>`. Spring
 Data JPA writes the code at run time. From `JpaRepository` you get `save`, `findById`,
-`findAll`, `delete` and `count` for free. The other methods are **derived queries**: the
-SQL comes from the method name.
+`findAll`, `findAll(Pageable)`, `delete` and `count` for free. The other methods are
+**derived queries**: the SQL comes from the method name.
 
 | Method | SQL it runs |
 |---|---|
-| `findAllByOrderByFullNameAsc()` | `SELECT * FROM donors ORDER BY full_name` |
-| `findByBloodGroupOrderByFullNameAsc(g)` | `... WHERE blood_group = ? ORDER BY full_name` |
+| `findAll(pageable)` (built in) | `SELECT * FROM donors ORDER BY ... LIMIT 10 OFFSET ?` + a `count(*)` |
+| `findByBloodGroup(g, pageable)` | `... WHERE blood_group = ? ORDER BY ... LIMIT 10 OFFSET ?` + a `count(*)` |
 | `findByBloodGroupIn(groups)` | `... WHERE blood_group IN (?, ?, ...)` |
 | `findTop5ByOrderByCreatedAtDesc()` | `... ORDER BY created_at DESC LIMIT 5` |
 | `existsByPhone(phone)` | is there a row `WHERE phone = ?` |
@@ -289,6 +293,33 @@ succeeds or is fully undone.
   For updates there is no explicit `save()` call: Hibernate notices the changed fields of a
   loaded entity ("dirty checking") and runs `UPDATE` when the transaction ends.
 - **`getById`:** throws `DonorNotFoundException` if the id doesn't exist.
+- **`findPage`** gives one page of the donors list (10 per page), using Spring Data's
+  `Pageable`, so the database only sends those 10 rows:
+
+```java
+public static final int PAGE_SIZE = 10;
+private static final Sort BY_NAME = Sort.by(Sort.Order.asc("fullName").ignoreCase(), Sort.Order.asc("id"));
+
+public Page<Donor> findPage(BloodGroup bloodGroup, int pageNumber) {
+    // people count pages from 1, Spring Data from 0; keep the number in a safe range
+    int pageIndex = Math.min(Math.max(pageNumber, 1), Integer.MAX_VALUE / PAGE_SIZE) - 1;
+    Page<Donor> page = fetchPage(bloodGroup, pageIndex);
+    if (page.getTotalPages() > 0 && page.getNumber() >= page.getTotalPages()) {
+        page = fetchPage(bloodGroup, page.getTotalPages() - 1);   // past the end: show the last page
+    }
+    return page;
+}
+
+private Page<Donor> fetchPage(BloodGroup bloodGroup, int pageIndex) {
+    Pageable pageable = PageRequest.of(pageIndex, PAGE_SIZE, BY_NAME);
+    return bloodGroup == null
+            ? donorRepository.findAll(pageable)
+            : donorRepository.findByBloodGroup(bloodGroup, pageable);
+}
+```
+
+  Sorting by `id` after the name keeps the order fixed when two donors share a name, so
+  no donor appears on two pages or is skipped.
 - **`findSuitableDonors`** is the search, built with Java Streams:
 
 ```java
@@ -350,6 +381,8 @@ a **redirect** (`"redirect:/donors/5"`).
 - **`SearchController`**: `GET /search`. A broken link such as `?bloodGroup=XYZ` just shows
   the empty search form.
 - **`DonorController`**: everything under `/donors` (see [Pages and URLs](#6-pages-and-urls)).
+  - `list` takes `@RequestParam(defaultValue = "1") int page` and puts both the
+    `Page<Donor>` (`donorPage`) and its 10 donors (`donors`) in the model.
   - `@ModelAttribute` methods give every donor page the lists of blood groups and genders,
     and today's date (the date picker can't go past today).
   - `@Valid @ModelAttribute("donorForm") DonorForm form, BindingResult result` runs the
@@ -383,7 +416,8 @@ a **redirect** (`"redirect:/donors/5"`).
 | Method | URL | Controller method | Page / result |
 |---|---|---|---|
 | GET | `/` | `HomeController.home` | `home.jsp` |
-| GET | `/donors` | `DonorController.list` | `donors/list.jsp` |
+| GET | `/donors` | `DonorController.list` | `donors/list.jsp`, page 1 (10 donors) |
+| GET | `/donors?page=2` | `DonorController.list` | `donors/list.jsp`, page 2 |
 | GET | `/donors?bloodGroup=A_POSITIVE` | `DonorController.list` | `donors/list.jsp`, filtered |
 | GET | `/donors/new` | `showRegisterForm` | `donors/form.jsp` (empty) |
 | POST | `/donors` | `register` | redirect to `/donors/{id}`, or the form with errors |
@@ -508,6 +542,7 @@ waits about 28 seconds), and the database set-up happens during the first visit.
 | `blood-group-badge.tag` | The red "A+" pill |
 | `availability-badge.tag` | "Can donate now" / "Can donate from ..." / "Not available" |
 | `date.tag` | Formats a date as `10 Aug 2026` |
+| `pagination.tag` | "Showing 1–10 of 12", Previous / Next and page numbers for any Spring Data `Page`. Keeps a filter (like `bloodGroup`) in every link, and hides itself when there is only one page |
 
 `header.jspf` and `footer.jspf` are fragments included by `page.tag`.
 
@@ -534,7 +569,7 @@ JSP stays clean:
 | `base/theme.css` | Design tokens: the blood-red brand colours, fonts, shadows. Change a colour here and the whole site follows |
 | `base/base.css` | Defaults for `body`, headings, links, focus outline |
 | `layout/` | Page width, header, footer |
-| `components/` | Buttons, cards, form fields, tables, badges, chips, alerts |
+| `components/` | Buttons, cards, form fields, tables, badges, chips, alerts, pagination |
 | `pages/` | Styles used by one page only |
 
 **How the CSS is built:** `main.css` imports every file. During `mvn package` (or
@@ -581,7 +616,7 @@ the first time, so a PC only needs Java.
 | Command | What it does |
 |---|---|
 | `./mvnw spring-boot:run` | Build the CSS and run the app at http://localhost:8080 |
-| `./mvnw test` | Run the 22 tests |
+| `./mvnw test` | Run the 27 tests |
 | `./mvnw package` | Test and build `target/app.war` |
 | `java -jar target/app.war` | Run the built app |
 
@@ -619,13 +654,13 @@ visitor waits a few seconds while Java starts again.
 
 ## 12. Tests
 
-Run them with `./mvnw test`. All 22 pass.
+Run them with `./mvnw test`. All 27 pass.
 
 | Test class | Type | Tests | What it checks |
 |---|---|---|---|
 | `BloodGroupTest` | Plain unit test | 6 | Compatibility rules (AB+ receives from all, O- gives to all ...) and labels |
-| `DonorServiceTest` | Spring Boot + in-memory H2 | 7 | Search filters and order, 90/120-day rule, dashboard counts, blood group stored as label |
-| `DonorControllerTest` | Spring MockMvc | 9 | Pages load, valid form redirects, invalid form shows errors, duplicate mobile rejected, 404 for unknown donors, availability, delete, search |
+| `DonorServiceTest` | Spring Boot + in-memory H2 | 10 | Search filters and order, 90/120-day rule, dashboard counts, blood group stored as label, 10 per page sorted by name, page filter, out-of-range page numbers |
+| `DonorControllerTest` | Spring MockMvc | 11 | Pages load, valid form redirects, invalid form shows errors, duplicate mobile rejected, 404 for unknown donors, availability, delete, search, page 2 of the list, `?page=abc` gives 404 |
 
 Each service and controller test runs inside a transaction that is **rolled back** afterwards,
 so tests never affect each other. The Flyway migration runs at the start, so the tests also
@@ -644,7 +679,7 @@ prove the SQL file and the `Donor` class match.
 | `DonorService.findSuitableDonors()` | `List`, `Set`, Streams, `Comparator` | Filter and sort donors |
 | `DonorService.getDashboardStats()` | `EnumMap`, `Map.merge` | Count donors per group |
 | `DashboardStats` | `Map<BloodGroup, Long>` | Pass counts to the page |
-| Repository methods | `List<Donor>`, `Collection<BloodGroup>` | Query results and parameters |
+| Repository methods | `List<Donor>`, `Collection<BloodGroup>`, `Page<Donor>` | Query results and parameters |
 | `SampleDataLoader` | `List.of(...)` | Immutable list of sample donors |
 
 ### Spring Boot
@@ -719,6 +754,12 @@ It runs the method in one database transaction: either every change is saved, or
 **What is Post/Redirect/Get?**
 After a form POST, the server sends a redirect to a GET page. Refreshing that page
 doesn't submit the form again.
+
+**How does pagination work?**
+The controller reads `?page=2`, the service builds `PageRequest.of(1, 10, sort by name)`,
+and Spring Data JPA adds `LIMIT 10 OFFSET 10` to the SQL plus a `count(*)` query. The result
+is a `Page<Donor>` with the 10 donors, the page number and the totals, which `pagination.tag`
+uses to draw "Showing 11–20 of 25" and the links.
 
 **How is the site protected from script injection (XSS)?**
 User text is printed with `<c:out>` or Spring form tags, which escape HTML characters.

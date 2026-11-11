@@ -1,6 +1,9 @@
 package com.group2.blooddonation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
@@ -125,13 +128,37 @@ class DonorControllerTest {
     }
 
     @Test
+    void donorsListShowsTenDonorsPerPage() throws Exception {
+        for (int i = 0; i < 12; i++) {
+            saveDonor("98765432" + (20 + i));
+        }
+
+        mockMvc.perform(get("/donors"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("donors", hasSize(10)))
+                .andExpect(model().attribute("donorPage", hasProperty("totalPages", is(2))));
+
+        mockMvc.perform(get("/donors").param("page", "2"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("donors", hasSize(2)))
+                .andExpect(model().attribute("donorPage", hasProperty("number", is(1))));
+    }
+
+    @Test
+    void textPageNumberShowsTheNotFoundPage() throws Exception {
+        mockMvc.perform(get("/donors").param("page", "abc"))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("error/404"));
+    }
+
+    @Test
     void searchListsSuitableDonors() throws Exception {
         saveDonor("9876543213");
 
         mockMvc.perform(get("/search").param("bloodGroup", "AB_POSITIVE"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("search/search"))
-                .andExpect(model().attribute("results", org.hamcrest.Matchers.hasSize(1)));
+                .andExpect(model().attribute("results", hasSize(1)));
     }
 
     @Test

@@ -20,7 +20,7 @@ and deployed for free on **Vercel + Neon**.
 ## Features at a glance
 
 - Register, view, edit and delete donors
-- Filter donors by blood group
+- Donors list with 10 donors per page, filterable by blood group
 - Find suitable donors for a patient: compatible groups, city, "can donate today"
 - Record a donation and see when the donor can donate again (90 days men / 120 days women)
 - Mark donors as available or not available
@@ -40,7 +40,7 @@ local H2 database with 12 made-up donors.
 
 | Command | What it does |
 |---|---|
-| `./mvnw test` | Run the 22 tests |
+| `./mvnw test` | Run the 27 tests |
 | `./mvnw package` | Build `target/app.war` |
 | `java -jar target/app.war` | Run the built app |
 | `npm run watch:css` | Rebuild the CSS on every save while styling (needs Node.js) |

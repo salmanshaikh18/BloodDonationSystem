@@ -1,9 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
-<c:set var="donorCount" value="${fn:length(donors)}"/>
+<%-- Total across all pages, not just the 10 shown --%>
+<c:set var="donorCount" value="${donorPage.totalElements}"/>
 
 <ui:page title="Donors" activeNav="donors">
 
@@ -83,6 +83,9 @@
                     </tbody>
                 </table>
             </div>
+
+            <ui:pagination pageResult="${donorPage}" path="/donors"
+                           paramName="bloodGroup" paramValue="${selectedBloodGroup}"/>
         </c:otherwise>
     </c:choose>
 

@@ -8,7 +8,7 @@ package "controller" {
     + home(model) : String
   }
   class DonorController {
-    + list(bloodGroup, model) : String
+    + list(bloodGroup, page, model) : String
     + details(id, model) : String
     + showRegisterForm(model) : String
     + register(form, result, redirect) : String
@@ -25,7 +25,9 @@ package "controller" {
 
 package "service" {
   class DonorService <<Service>> {
-    + findAll(bloodGroup) : List<Donor>
+    + {static} PAGE_SIZE : int = 10
+    --
+    + findPage(bloodGroup, pageNumber) : Page<Donor>
     + findRecentlyRegistered() : List<Donor>
     + getById(id) : Donor
     + isPhoneTaken(phone, excludeDonorId) : boolean
@@ -41,8 +43,7 @@ package "service" {
 
 package "repository" {
   interface DonorRepository <<Repository>> {
-    + findAllByOrderByFullNameAsc() : List<Donor>
-    + findByBloodGroupOrderByFullNameAsc(group) : List<Donor>
+    + findByBloodGroup(group, pageable) : Page<Donor>
     + findByBloodGroupIn(groups) : List<Donor>
     + findTop5ByOrderByCreatedAtDesc() : List<Donor>
     + existsByPhone(phone) : boolean

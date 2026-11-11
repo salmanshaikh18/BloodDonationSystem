@@ -82,15 +82,23 @@ After saving, you land on the new donor's page with the message
 
 ## 3. View donors and filter by blood group
 
-**Address:** `/donors`, or `/donors?bloodGroup=O_POSITIVE` for one group
+**Address:** `/donors`, `/donors?page=2` for the next page, or
+`/donors?bloodGroup=O_POSITIVE` for one group
 
 ![Donors list](screenshots/02-donors.png)
 
-- **List:** every donor, sorted by name, with blood group, city, mobile number, last donation
-  date and status.
+- **List:** donors sorted by name (capital letters don't matter), with blood group, city,
+  mobile number, last donation date and status.
+- **Pages:** 10 donors per page. Under the table you see **"Showing 1–10 of 12"**,
+  **Previous / Next** buttons and the page numbers (the current one in red). With many pages
+  it shows the first, last and nearby pages, with "…" in between. On phones it shows
+  **"Page 1 of 2"** between Previous and Next. When everything fits on one page, the bar is
+  hidden.
+- **Safe page links:** `?page=0` opens the first page and `?page=99` opens the last page.
+  A link like `?page=abc` shows the "Page not found" page.
 - **Filter by blood group:** click a chip (**A+**, **O-** ...) to show only that group, or
   **All** to show everyone. The chip you picked turns red and the heading says how many
-  donors match.
+  donors match. The filter stays on when you move between pages.
 - **Call:** tap a mobile number on a phone to call the donor.
 - **View:** opens the donor's page.
 - **Empty list:** if nobody matches, a message with a **Register a donor** button is shown.
@@ -275,7 +283,6 @@ Good points to mention as **future scope** in a viva:
 - **Login and roles:** today anyone with the link can add, edit or delete donors. An admin
   login (Spring Security) would protect these actions.
 - **Notifications:** SMS, WhatsApp or email alerts to suitable donors.
-- **Paging:** the donors list shows everyone on one page, which is fine for hundreds of
-  donors but not for thousands.
+- **Sorting and text search on the donors list:** for example sort by city, or search by name.
 - **Donation history:** only the *last* donation date is kept, not every donation.
 - **Blood stock:** tracking units of blood in a blood bank, not just donors.
