@@ -31,5 +31,9 @@ ENV SPRING_PROFILES_ACTIVE=prod \
     PORT=80
 EXPOSE 80
 
-# Use up to 75% of the memory Vercel gives the app, and Indian time so "today" is correct
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-Duser.timezone=Asia/Kolkata", "-jar", "app.war"]
+# Java settings:
+#   MaxRAMPercentage=75   use up to 75% of the memory Vercel gives the app
+#   TieredStopAtLevel=1   start faster (best for a small app that sleeps when idle)
+#   UseSerialGC           the simplest garbage collector, ideal for one small CPU
+#   user.timezone         Indian time, so "today" is correct
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-XX:TieredStopAtLevel=1", "-XX:+UseSerialGC", "-Duser.timezone=Asia/Kolkata", "-jar", "app.war"]
