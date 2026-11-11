@@ -1,7 +1,6 @@
 # Blood Donation Management System
 
-MCA 1st year project, Group 2. A small web app that keeps blood donor details and helps
-find suitable donors for a patient.
+A small web app that keeps blood donor details and helps find suitable donors for a patient.
 
 ## Features
 
