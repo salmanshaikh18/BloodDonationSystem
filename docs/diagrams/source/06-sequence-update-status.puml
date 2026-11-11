@@ -1,0 +1,51 @@
+@startuml
+!include _style.iuml
+autonumber
+skinparam sequenceMessageAlign left
+
+title Sequence Diagram - Update Availability and Record a Donation
+
+actor "Volunteer" as User
+participant "Browser\n(details.jsp + app.js)" as Browser
+participant "DonorController" as Ctrl
+participant "DonorService" as Service
+participant "DonorRepository" as Repo
+participant "Donor\n(entity)" as Donor
+database "PostgreSQL\ndonors table" as DB
+
+== Mark a donor as not available ==
+User -> Browser : Click "Mark as not available"
+Browser -> Ctrl : POST /donors/{id}/availability\n(available=false)
+Ctrl -> Service : changeAvailability(id, false)
+Service -> Repo : findById(id)
+Repo -> DB : SELECT ... WHERE id = ?
+alt donor does not exist
+  Service --> Ctrl : throws DonorNotFoundException
+  Ctrl --> Browser : 404 page (GlobalExceptionHandler)
+else donor found
+  Service -> Donor : setAvailable(false)
+  Service -> DB : on commit: UPDATE donors\nSET available = false
+  Service --> Ctrl : Donor
+  Ctrl --> Browser : redirect to /donors/{id}\n+ "... is now marked as not available."
+end
+
+== Record a donation made today ==
+User -> Browser : Click "Record donation today"
+Browser -> User : app.js asks: "Record a blood donation\nmade today by this donor?"
+User -> Browser : OK
+Browser -> Ctrl : POST /donors/{id}/donations
+Ctrl -> Service : recordDonation(id, today)
+Service -> Repo : findById(id)
+Repo -> DB : SELECT ... WHERE id = ?
+Service -> Donor : setLastDonationDate(today)
+Service -> DB : on commit: UPDATE donors\nSET last_donation_date = today
+Service --> Ctrl : Donor
+Ctrl --> Browser : redirect to /donors/{id}\n+ "Donation recorded for today."
+Browser -> Ctrl : GET /donors/{id}
+Ctrl -> Service : getById(id)
+Service --> Ctrl : Donor
+Ctrl -> Donor : details.jsp calls getNextEligibleDate()
+Donor --> Ctrl : today + 90 days (men)\nor + 120 days (women)
+Ctrl --> Browser : donors/details.jsp (HTML)
+Browser --> User : Status: "Can donate from <date>"
+@enduml

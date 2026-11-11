@@ -1,0 +1,34 @@
+@startuml
+!include _dfd-style.iuml
+
+title DFD Level 1
+
+rectangle "Volunteer /\nBlood Bank Staff" as Staff
+rectangle "Blood Seeker" as Seeker
+
+usecase "1.0\nManage\nDonors" as P1
+usecase "2.0\nUpdate Donation\nStatus" as P2
+usecase "3.0\nSearch\nDonors" as P3
+usecase "4.0\nGenerate\nDashboard" as P4
+
+database "D1  Donors" as D1
+database "D2  Blood\nCompatibility Rules" as D2
+
+Staff --> P1 : new / edited donor details,\ndelete request
+P1 --> Staff : confirmation or\nvalidation errors
+P1 --> D1 : insert / update /\ndelete donor
+D1 --> P1 : donor with same mobile
+
+Staff --> P2 : availability change,\ndonation made today
+D1 --> P2 : donor record
+P2 --> D1 : available flag,\nlast donation date
+P2 --> Staff : new status,\nnext eligible date
+
+Seeker --> P3 : blood group, city,\nsearch options
+D2 --> P3 : compatible groups
+D1 --> P3 : donor records
+P3 --> Seeker : suitable donors
+
+D1 --> P4 : all donors
+P4 --> Staff : totals and counts\nper blood group
+@enduml

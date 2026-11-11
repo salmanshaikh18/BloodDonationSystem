@@ -1,0 +1,48 @@
+@startuml
+!include _style.iuml
+left to right direction
+skinparam packageStyle rectangle
+
+title Use Case Diagram - Blood Donation Management System
+
+actor "Volunteer /\nBlood Bank Staff" as Staff
+actor "Blood Seeker\n(patient's family)" as Seeker
+
+rectangle "Blood Donation Management System" {
+  usecase "View dashboard" as UC_Dash
+  usecase "Register donor" as UC_Reg
+  usecase "View donor list" as UC_List
+  usecase "Filter donors\nby blood group" as UC_Filter
+  usecase "View donor details" as UC_View
+  usecase "Edit donor details" as UC_Edit
+  usecase "Update availability" as UC_Avail
+  usecase "Record donation" as UC_Donation
+  usecase "Delete donor" as UC_Delete
+  usecase "Find suitable donors" as UC_Find
+  usecase "Call donor" as UC_Call
+  usecase "Validate donor\ndetails" as UC_Validate
+  usecase "Check blood\ncompatibility" as UC_Compat
+  usecase "Check donation\neligibility" as UC_Elig
+}
+
+Staff -- UC_Dash
+Staff -- UC_Reg
+Staff -- UC_List
+Staff -- UC_View
+Staff -- UC_Edit
+Staff -- UC_Avail
+Staff -- UC_Donation
+Staff -- UC_Delete
+
+UC_Dash -- Seeker
+UC_List -- Seeker
+UC_Find -- Seeker
+UC_Call -- Seeker
+
+UC_Filter .> UC_List : <<extend>>
+UC_Reg ..> UC_Validate : <<include>>
+UC_Edit ..> UC_Validate : <<include>>
+UC_Find ..> UC_Compat : <<include>>
+UC_Find ..> UC_Elig : <<include>>
+UC_Donation ..> UC_Elig : <<include>>
+@enduml

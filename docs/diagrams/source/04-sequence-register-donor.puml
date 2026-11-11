@@ -1,0 +1,53 @@
+@startuml
+!include _style.iuml
+autonumber
+skinparam sequenceMessageAlign left
+
+title Sequence Diagram - Register a Donor
+
+actor "Volunteer" as User
+participant "Browser\n(form.jsp)" as Browser
+participant "DonorController" as Ctrl
+participant "DonorForm\n(validation rules)" as Form
+participant "DonorService" as Service
+participant "DonorRepository" as Repo
+database "PostgreSQL\ndonors table" as DB
+
+User -> Browser : Fill in the Register donor form\nand click "Register donor"
+Browser -> Ctrl : POST /donors (form fields)
+Ctrl -> Form : Spring binds the fields\nand runs @Valid checks
+Form --> Ctrl : BindingResult (errors, if any)
+
+alt a field breaks a rule (e.g. age 16, 9-digit mobile)
+  Ctrl --> Browser : show donors/form.jsp again\nwith a message under each wrong field
+else all fields are valid
+  Ctrl -> Service : isPhoneTaken(phone, null)
+  Service -> Repo : existsByPhone(phone)
+  Repo -> DB : SELECT ... WHERE phone = ?
+  DB --> Repo : found / not found
+  Repo --> Service : true / false
+  Service --> Ctrl : true / false
+
+  alt mobile number already used
+    Ctrl --> Browser : show the form with\n"Another donor already uses this mobile number"
+  else mobile number is free
+    Ctrl -> Service : register(form)
+    Service -> Service : donor = new Donor()\nform.applyTo(donor)
+    Service -> Repo : save(donor)
+    Repo -> DB : INSERT INTO donors (...)
+    DB --> Repo : new id
+    Repo --> Service : saved Donor
+    Service --> Ctrl : saved Donor
+    Ctrl --> Browser : 302 redirect to /donors/{id}\n+ success message (flash attribute)
+    Browser -> Ctrl : GET /donors/{id}
+    Ctrl -> Service : getById(id)
+    Service -> Repo : findById(id)
+    Repo -> DB : SELECT ... WHERE id = ?
+    DB --> Repo : donor row
+    Repo --> Service : Donor
+    Service --> Ctrl : Donor
+    Ctrl --> Browser : donors/details.jsp (HTML)
+    Browser --> User : Donor page:\n"<name> has been registered as a donor."
+  end
+end
+@enduml

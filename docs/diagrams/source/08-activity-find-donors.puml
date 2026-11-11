@@ -1,0 +1,52 @@
+@startuml
+!include _style.iuml
+
+title Activity Diagram - Find Suitable Donors
+
+|Blood Seeker|
+start
+:Open "Find donors";
+:Choose the patient's blood group;
+:Optionally enter a city and change
+"Include compatible groups" /
+"Only donors who can donate today";
+:Click "Search donors";
+|System|
+if (Include compatible groups?) then (yes)
+  :Groups = every group the patient
+  can receive from
+  (e.g. A+ gets A+, A-, O+, O-);
+else (no)
+  :Groups = the patient's own group;
+endif
+|Database|
+:SELECT donors whose blood group
+is in the chosen groups;
+|System|
+if (City entered?) then (yes)
+  :Keep donors whose city
+  contains the text;
+else (no)
+endif
+if (Only donors who can donate today?) then (yes)
+  :Keep donors who are available AND
+  last donated at least 90 days ago (men)
+  or 120 days ago (women), or never;
+else (no)
+endif
+:Sort: same group first, then
+ready today, then by name;
+if (Any donors left?) then (yes)
+  :Show result cards with status
+  and a "Call" button;
+  |Blood Seeker|
+  :Call a suitable donor;
+else (no)
+  |System|
+  :Show "No matching donors"
+  with tips to widen the search;
+  |Blood Seeker|
+  :Change the filters and search again;
+endif
+stop
+@enduml

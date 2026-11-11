@@ -1,0 +1,47 @@
+@startuml
+!include _style.iuml
+autonumber
+skinparam sequenceMessageAlign left
+
+title Sequence Diagram - Find Suitable Donors
+
+actor "Blood Seeker" as User
+participant "Browser\n(search.jsp)" as Browser
+participant "SearchController" as Ctrl
+participant "DonorService" as Service
+participant "BloodGroup\n(enum)" as BG
+participant "DonorRepository" as Repo
+database "PostgreSQL\ndonors table" as DB
+participant "Donor" as Donor
+
+User -> Browser : Choose the patient's blood group (A+),\noptional city, click "Search donors"
+Browser -> Ctrl : GET /search?bloodGroup=A_POSITIVE&city=...
+Ctrl -> Service : findSuitableDonors(criteria)
+
+alt "Include compatible groups" is ticked
+  Service -> BG : A_POSITIVE.getCompatibleDonors()
+  BG --> Service : {A+, A-, O+, O-}
+else not ticked
+  Service -> Service : groups = {A+} only
+end
+
+Service -> Repo : findByBloodGroupIn(groups)
+Repo -> DB : SELECT * FROM donors\nWHERE blood_group IN ('A+','A-','O+','O-')
+DB --> Repo : matching rows
+Repo --> Service : List<Donor>
+
+loop for each donor (Java stream)
+  opt a city was entered
+    Service -> Service : keep only if the city matches
+  end
+  opt "Only donors who can donate today" is ticked
+    Service -> Donor : isReadyToDonate()
+    Donor --> Service : available AND enough days\nsince the last donation
+  end
+end
+
+Service -> Service : sort: same group first,\nready today first, then by name
+Service --> Ctrl : List<Donor> results
+Ctrl --> Browser : search/search.jsp with the results
+Browser --> User : Result cards with status\nand a "Call" button
+@enduml

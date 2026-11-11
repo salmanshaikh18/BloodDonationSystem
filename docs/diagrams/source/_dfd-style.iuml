@@ -1,0 +1,13 @@
+' Data Flow Diagram notation used in every DFD:
+'   rectangle (bold border) = external entity
+'   oval                    = process (numbered)
+'   cylinder                = data store (D1, D2 ...)
+'   arrow with label        = data flow
+!include _style.iuml
+left to right direction
+skinparam rectangle {
+  BorderThickness 2
+}
+skinparam usecase {
+  BorderThickness 1.5
+}

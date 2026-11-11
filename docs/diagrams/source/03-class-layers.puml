@@ -1,0 +1,90 @@
+@startuml
+!include _style.iuml
+
+title Class Diagram - Application Layers
+
+package "controller" {
+  class HomeController {
+    + home(model) : String
+  }
+  class DonorController {
+    + list(bloodGroup, model) : String
+    + details(id, model) : String
+    + showRegisterForm(model) : String
+    + register(form, result, redirect) : String
+    + showEditForm(id, model) : String
+    + update(id, form, result, model, redirect) : String
+    + changeAvailability(id, available, redirect) : String
+    + recordDonation(id, redirect) : String
+    + delete(id, redirect) : String
+  }
+  class SearchController {
+    + search(criteria, result, model) : String
+  }
+}
+
+package "service" {
+  class DonorService <<Service>> {
+    + findAll(bloodGroup) : List<Donor>
+    + findRecentlyRegistered() : List<Donor>
+    + getById(id) : Donor
+    + isPhoneTaken(phone, excludeDonorId) : boolean
+    + findSuitableDonors(criteria) : List<Donor>
+    + getDashboardStats() : DashboardStats
+    + register(form) : Donor
+    + update(id, form) : Donor
+    + changeAvailability(id, available) : Donor
+    + recordDonation(id, date) : Donor
+    + delete(id) : Donor
+  }
+}
+
+package "repository" {
+  interface DonorRepository <<Repository>> {
+    + findAllByOrderByFullNameAsc() : List<Donor>
+    + findByBloodGroupOrderByFullNameAsc(group) : List<Donor>
+    + findByBloodGroupIn(groups) : List<Donor>
+    + findTop5ByOrderByCreatedAtDesc() : List<Donor>
+    + existsByPhone(phone) : boolean
+    + existsByPhoneAndIdNot(phone, id) : boolean
+  }
+}
+
+package "exception" {
+  class DonorNotFoundException
+  class GlobalExceptionHandler <<ControllerAdvice>> {
+    + handleNotFound() : String
+  }
+}
+
+package "config" {
+  class SampleDataLoader <<Component>> {
+    + run(args) : void
+  }
+  class WebConfig <<Configuration>> {
+    + resourceUrlEncodingFilter() : ResourceUrlEncodingFilter
+  }
+}
+
+package "model" {
+  class Donor <<Entity>>
+}
+
+' Types that come from Java and Spring, not from this project
+interface "JpaRepository<Donor, Long>\n(Spring Data)" as JpaRepository
+class "RuntimeException\n(Java)" as RuntimeException
+interface "ApplicationRunner\n(Spring Boot)" as ApplicationRunner
+
+HomeController --> DonorService
+DonorController --> DonorService
+SearchController --> DonorService
+DonorService --> DonorRepository
+DonorRepository --|> JpaRepository
+DonorRepository ..> Donor : stores
+DonorService ..> Donor : uses
+DonorService ..> DonorNotFoundException : throws
+DonorNotFoundException --|> RuntimeException
+GlobalExceptionHandler ..> DonorNotFoundException : handles
+SampleDataLoader ..|> ApplicationRunner
+SampleDataLoader --> DonorRepository
+@enduml

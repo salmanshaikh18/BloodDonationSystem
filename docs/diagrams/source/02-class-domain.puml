@@ -1,0 +1,102 @@
+@startuml
+!include _style.iuml
+
+title Class Diagram - Domain Model (model and dto packages)
+
+package "model" {
+  class Donor <<Entity>> {
+    - id : Long
+    - fullName : String
+    - age : int
+    - gender : Gender
+    - bloodGroup : BloodGroup
+    - phone : String
+    - email : String
+    - city : String
+    - lastDonationDate : LocalDate
+    - available : boolean
+    - createdAt : LocalDateTime
+    - updatedAt : LocalDateTime
+    --
+    + getNextEligibleDate() : LocalDate
+    + isEligibleToDonate() : boolean
+    + isReadyToDonate() : boolean
+  }
+
+  enum BloodGroup {
+    A_POSITIVE
+    A_NEGATIVE
+    B_POSITIVE
+    B_NEGATIVE
+    AB_POSITIVE
+    AB_NEGATIVE
+    O_POSITIVE
+    O_NEGATIVE
+    --
+    - label : String
+    - {static} CAN_RECEIVE_FROM : Map<BloodGroup, Set<BloodGroup>>
+    --
+    + getLabel() : String
+    + getCompatibleDonors() : Set<BloodGroup>
+    + getCanDonateTo() : Set<BloodGroup>
+    + {static} fromLabel(label : String) : BloodGroup
+  }
+
+  enum Gender {
+    MALE
+    FEMALE
+    OTHER
+    --
+    - label : String
+    - donationGapDays : int
+  }
+
+  class BloodGroupConverter {
+    + convertToDatabaseColumn(group : BloodGroup) : String
+    + convertToEntityAttribute(label : String) : BloodGroup
+  }
+
+}
+
+' Interface that comes from Jakarta Persistence (JPA), not from this project
+interface "AttributeConverter<BloodGroup, String>\n(JPA)" as AttributeConverter
+
+package "dto" {
+  class DonorForm {
+    - fullName : String
+    - age : Integer
+    - gender : Gender
+    - bloodGroup : BloodGroup
+    - phone : String
+    - email : String
+    - city : String
+    - lastDonationDate : LocalDate
+    - available : boolean
+    --
+    + {static} from(donor : Donor) : DonorForm
+    + applyTo(donor : Donor) : void
+  }
+
+  class DonorSearchCriteria {
+    - bloodGroup : BloodGroup
+    - city : String
+    - includeCompatible : boolean
+    - onlyReady : boolean
+  }
+
+  class DashboardStats <<record>> {
+    + totalDonors : long
+    + availableDonors : long
+    + readyDonors : long
+    + donorsPerBloodGroup : Map<BloodGroup, Long>
+  }
+}
+
+Donor "*" --> "1" BloodGroup
+Donor "*" --> "1" Gender
+BloodGroupConverter ..|> AttributeConverter
+BloodGroupConverter ..> BloodGroup : converts
+DonorForm ..> Donor : creates / updates
+DonorSearchCriteria --> BloodGroup
+DashboardStats --> BloodGroup
+@enduml

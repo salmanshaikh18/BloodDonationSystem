@@ -1,0 +1,40 @@
+@startuml
+!include _style.iuml
+
+title Activity Diagram - Manage a Donor (donor page actions)
+
+start
+:Volunteer opens a donor's page;
+:System loads the donor and works out the status
+(available? enough days since the last donation?
+next date they can donate);
+:Volunteer chooses an action;
+switch (Action?)
+case (Edit details)
+  :Change the details and save;
+  :Validate, then UPDATE the donor;
+case (Mark available /\nnot available)
+  :Switch "available"
+  and UPDATE the donor;
+case (Record donation today)
+  if (Enough days since\nthe last donation?) then (yes)
+    :Confirm in the pop-up;
+    :Set last donation date = today;
+    :Next date = today + 90 days (men)
+    or + 120 days (women);
+  else (no)
+    :Button is disabled:
+    "Too soon after the last donation";
+    stop
+  endif
+case (Delete donor)
+  if (Confirm "Delete this donor?") then (OK)
+    :DELETE the donor;
+    :Go back to the donors list;
+  else (Cancel)
+    stop
+  endif
+endswitch
+:Show the page with a success message;
+stop
+@enduml

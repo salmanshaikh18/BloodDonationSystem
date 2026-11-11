@@ -1,0 +1,46 @@
+@startuml
+!include _style.iuml
+
+title Activity Diagram - Register a Donor
+
+|Volunteer|
+start
+:Open the "Register donor" page;
+repeat
+  |Volunteer|
+  :Fill in or correct the form
+  (name, age, gender, blood group,
+  mobile, email, city, last donation date);
+  :Click "Register donor";
+  |System|
+  :Tidy the input
+  (trim spaces, remove +91 from mobile,
+  lowercase the email);
+  :Check the rules
+  (age 18-65, 10-digit mobile starting 6-9,
+  valid email, no future donation date ...);
+  if (All rules pass?) then (yes)
+    |Database|
+    :Look for another donor
+    with the same mobile number;
+    |System|
+    if (Mobile already used?) then (yes)
+      :Add the error "Another donor
+      already uses this mobile number";
+    else (no)
+    endif
+  else (no)
+    :Mark each wrong field
+    with a message;
+  endif
+repeat while (Any errors?) is (yes: show the form again) not (no)
+|Database|
+:INSERT the new donor
+into the donors table;
+|System|
+:Redirect to the donor's page
+with a success message;
+|Volunteer|
+:See the new donor's details;
+stop
+@enduml

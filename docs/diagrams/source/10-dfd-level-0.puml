@@ -1,0 +1,14 @@
+@startuml
+!include _dfd-style.iuml
+
+title DFD Level 0 (Context Diagram)
+
+rectangle "Volunteer /\nBlood Bank Staff" as Staff
+usecase "0\nBlood Donation\nManagement System" as P0
+rectangle "Blood Seeker" as Seeker
+
+Staff --> P0 : donor details,\nchanges, deletions,\navailability, donations
+P0 --> Staff : donor list, donor details,\nstatistics, confirmations,\nerror messages
+Seeker --> P0 : patient's blood group,\ncity, search options
+P0 --> Seeker : suitable donors\nwith status and\nmobile numbers
+@enduml

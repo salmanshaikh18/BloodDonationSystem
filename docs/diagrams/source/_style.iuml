@@ -1,0 +1,11 @@
+' Shared look for every diagram: plain black-and-white, good for printing.
+!theme plain
+!pragma layout smetana
+skinparam dpi 150
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam titleFontSize 18
+skinparam shadowing false
+skinparam roundCorner 10
+skinparam ArrowColor #333333
+skinparam classAttributeIconSize 0

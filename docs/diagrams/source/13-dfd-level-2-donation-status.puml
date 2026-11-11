@@ -1,0 +1,26 @@
+@startuml
+!include _dfd-style.iuml
+
+title DFD Level 2 - Process 2.0 Update Donation Status
+
+rectangle "Volunteer /\nBlood Bank Staff" as Staff
+
+usecase "2.1\nChange\nAvailability" as P21
+usecase "2.2\nCheck\nEligibility" as P22
+usecase "2.3\nRecord\nDonation" as P23
+usecase "2.4\nCalculate Next\nEligible Date" as P24
+
+database "D1  Donors" as D1
+
+Staff --> P21 : available /\nnot available
+P21 --> D1 : available flag
+P21 --> Staff : new status
+
+Staff --> P22 : donation made today
+D1 --> P22 : gender,\nlast donation date
+P22 --> Staff : too soon (not allowed)
+P22 --> P23 : eligible donor
+P23 --> D1 : last donation date = today
+P23 --> P24 : donation date, gender
+P24 --> Staff : next eligible date\n(+90 days men, +120 days women)
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+!include _dfd-style.iuml
+
+title DFD Level 2 - Process 3.0 Search Donors
+
+rectangle "Blood Seeker" as Seeker
+
+usecase "3.1\nFind Compatible\nGroups" as P31
+usecase "3.2\nFetch Donors\nby Group" as P32
+usecase "3.3\nFilter\nby City" as P33
+usecase "3.4\nCheck\nReadiness" as P34
+usecase "3.5\nSort\nResults" as P35
+
+database "D1  Donors" as D1
+database "D2  Blood\nCompatibility Rules" as D2
+
+Seeker --> P31 : patient's blood group,\ninclude compatible
+D2 --> P31 : who can receive\nfrom whom
+P31 --> P32 : donor blood groups
+D1 --> P32 : matching donor records
+P32 --> P33 : donors
+Seeker --> P33 : city (optional)
+P33 --> P34 : donors in the city
+P34 --> P35 : available donors with\nenough days since last donation
+P35 --> Seeker : suitable donors,\nbest matches first
+@enduml
