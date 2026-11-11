@@ -1,0 +1,26 @@
+/* Rounded chips: the blood group filter on the Donors page, and small read-only chips */
+@layer components {
+    .chip-list {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .chip {
+        @apply inline-flex items-center rounded-full border border-stone-300 bg-white px-3.5 py-1.5 text-sm font-medium text-stone-700;
+    }
+
+    a.chip {
+        @apply hover:border-stone-400 hover:text-stone-900;
+    }
+
+    .chip[aria-current="page"] {
+        @apply border-brand-600 bg-brand-600 text-white hover:text-white;
+    }
+
+    .chip-sm {
+        @apply px-2.5 py-0.5 text-xs;
+    }
+
+    .filter-bar {
+        @apply mb-6;
+    }
+}

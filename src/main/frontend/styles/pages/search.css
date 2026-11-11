@@ -1,0 +1,62 @@
+/* Find donors page: filters, results and the compatibility table */
+@layer components {
+    .search-layout {
+        @apply grid grid-cols-1 items-start gap-6 lg:grid-cols-[20rem_minmax(0,1fr)];
+    }
+
+    .search-form {
+        @apply grid gap-5 lg:sticky lg:top-24;
+    }
+
+    .results-summary {
+        @apply mb-4;
+    }
+
+    .result-list {
+        @apply grid gap-3;
+    }
+
+    .result-card {
+        @apply flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-4 shadow-card sm:flex-row sm:items-center sm:p-5;
+    }
+
+    .result-main {
+        @apply flex min-w-0 flex-1 items-center gap-4;
+    }
+
+    .result-text {
+        @apply min-w-0;
+    }
+
+    .result-heading {
+        @apply flex flex-wrap items-center gap-2;
+    }
+
+    .result-name {
+        @apply font-semibold text-stone-900 hover:text-brand-700;
+    }
+
+    .result-meta {
+        @apply mt-0.5 text-sm text-stone-500;
+    }
+
+    .result-actions {
+        @apply flex flex-wrap items-center justify-between gap-3 sm:justify-end;
+    }
+
+    .compat-table {
+        @apply mt-4 w-full text-sm;
+    }
+
+    .compat-table th {
+        @apply pb-2 text-left text-xs font-semibold tracking-wider text-stone-500 uppercase;
+    }
+
+    .compat-table td {
+        @apply border-t border-stone-100 py-2.5 align-middle;
+    }
+
+    .compat-table td:first-child {
+        @apply w-20 pr-4;
+    }
+}

@@ -1,0 +1,22 @@
+/* 404 and 500 pages */
+@layer components {
+    .error-page {
+        @apply mx-auto max-w-lg py-12 text-center;
+    }
+
+    .error-code {
+        @apply text-6xl font-bold text-brand-600;
+    }
+
+    .error-title {
+        @apply mt-4 text-2xl font-bold;
+    }
+
+    .error-text {
+        @apply mt-2 text-stone-600;
+    }
+
+    .error-actions {
+        @apply mt-8 flex flex-wrap justify-center gap-3;
+    }
+}

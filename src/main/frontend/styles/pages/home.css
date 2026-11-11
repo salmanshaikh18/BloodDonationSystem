@@ -1,0 +1,90 @@
+/* Home page: intro, quick search, numbers, blood group tiles, recent donors */
+@layer components {
+    .hero {
+        @apply grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12;
+    }
+
+    .hero-eyebrow {
+        @apply text-sm font-semibold tracking-wider text-brand-700 uppercase;
+    }
+
+    .hero-title {
+        @apply mt-3 text-3xl font-bold text-balance text-stone-900 sm:text-4xl lg:text-5xl;
+    }
+
+    .hero-lead {
+        @apply mt-4 max-w-xl text-lg text-pretty text-stone-600;
+    }
+
+    .hero-actions {
+        @apply mt-6 flex flex-wrap gap-3;
+    }
+
+    .quick-search {
+        @apply grid gap-3;
+    }
+
+    .quick-search-row {
+        @apply flex flex-col gap-3 sm:flex-row;
+    }
+
+    .stats {
+        @apply mt-10 grid gap-4 sm:grid-cols-3;
+    }
+
+    .stat-card {
+        @apply rounded-2xl border border-stone-200 bg-white p-5 shadow-card;
+    }
+
+    .stat-card-highlight {
+        @apply border-brand-200 bg-brand-50;
+    }
+
+    .stat-value {
+        @apply block text-3xl font-bold text-stone-900 tabular-nums;
+    }
+
+    .stat-card-highlight .stat-value {
+        @apply text-brand-700;
+    }
+
+    .stat-label {
+        @apply mt-1 block text-sm text-stone-600;
+    }
+
+    .group-grid {
+        @apply grid grid-cols-2 gap-3 sm:grid-cols-4;
+    }
+
+    .group-tile {
+        @apply flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md;
+    }
+
+    .group-tile-label {
+        @apply text-2xl font-bold text-brand-700;
+    }
+
+    .group-tile-count {
+        @apply text-sm text-stone-600;
+    }
+
+    .donor-list {
+        @apply divide-y divide-stone-100 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-card;
+    }
+
+    .donor-list-item {
+        @apply flex items-center gap-4 px-4 py-3 hover:bg-stone-50 sm:px-5;
+    }
+
+    .donor-list-text {
+        @apply min-w-0 flex-1;
+    }
+
+    .donor-list-name {
+        @apply block truncate font-semibold text-stone-900;
+    }
+
+    .donor-list-meta {
+        @apply block truncate text-sm text-stone-500;
+    }
+}

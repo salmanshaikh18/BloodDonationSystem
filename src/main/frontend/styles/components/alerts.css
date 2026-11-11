@@ -1,0 +1,10 @@
+/* Messages shown after an action, for example "Donor details updated." */
+@layer components {
+    .alert {
+        @apply mb-6 rounded-xl border px-4 py-3 text-sm font-medium;
+    }
+
+    .alert-success {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-800;
+    }
+}

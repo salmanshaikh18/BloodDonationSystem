@@ -1,0 +1,17 @@
+<%-- Top bar, included by tags/page.tag --%>
+<header class="site-header">
+    <div class="site-header-inner">
+        <a class="brand" href="<c:url value='/'/>">
+            <img class="brand-logo" src="<c:url value='/images/logo.svg'/>" alt="" width="36" height="36">
+            <span class="brand-text">
+                <span class="brand-name">Blood Donation</span>
+                <span class="brand-tagline">Management System</span>
+            </span>
+        </a>
+        <nav class="site-nav" aria-label="Main">
+            <a class="nav-link" href="<c:url value='/donors'/>" ${activeNav == 'donors' ? 'aria-current="page"' : ''}>Donors</a>
+            <a class="nav-link" href="<c:url value='/search'/>" ${activeNav == 'search' ? 'aria-current="page"' : ''}>Find donors</a>
+            <a class="btn btn-primary btn-sm nav-cta" href="<c:url value='/donors/new'/>" ${activeNav == 'register' ? 'aria-current="page"' : ''}>Register donor</a>
+        </nav>
+    </div>
+</header>

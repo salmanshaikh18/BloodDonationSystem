@@ -1,0 +1,38 @@
+/* Donor details page and the Register / Edit form */
+@layer components {
+    .details-layout {
+        @apply grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem];
+    }
+
+    .profile-header {
+        @apply flex flex-wrap items-center gap-4 border-b border-stone-200 pb-6;
+    }
+
+    .profile-heading {
+        @apply min-w-0 flex-1;
+    }
+
+    .detail-list {
+        @apply grid gap-x-8 gap-y-5 pt-6 sm:grid-cols-2;
+    }
+
+    .detail-item dt {
+        @apply text-xs font-semibold tracking-wider text-stone-500 uppercase;
+    }
+
+    .detail-item dd {
+        @apply mt-1 text-stone-900;
+    }
+
+    .actions-card {
+        @apply grid gap-3 lg:sticky lg:top-24;
+    }
+
+    .form-page {
+        @apply mx-auto max-w-3xl;
+    }
+
+    .form-header {
+        @apply mb-8;
+    }
+}

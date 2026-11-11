@@ -1,0 +1,13 @@
+target/
+node/
+node_modules/
+data/
+.git/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+*.log
+.env
+.env.*
+.vercel/

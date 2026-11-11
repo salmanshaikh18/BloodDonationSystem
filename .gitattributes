@@ -1,0 +1,5 @@
+# Keep Unix line endings for shell scripts, even when someone commits from Windows,
+# otherwise ./mvnw stops working on Mac, Linux and Vercel.
+mvnw text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf

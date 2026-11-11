@@ -1,0 +1,76 @@
+/* Form layout, inputs, radios, checkboxes and error messages */
+@layer components {
+    .form {
+        @apply grid gap-8;
+    }
+
+    .form-section {
+        @apply grid min-w-0 gap-5;
+    }
+
+    .form-section-title {
+        @apply mb-4 text-xs font-semibold tracking-wider text-stone-500 uppercase;
+    }
+
+    .field {
+        @apply grid min-w-0 content-start gap-1.5;
+    }
+
+    .field-row {
+        @apply grid gap-5 sm:grid-cols-2;
+    }
+
+    .label {
+        @apply text-sm font-medium text-stone-800;
+    }
+
+    .required {
+        @apply text-brand-600;
+    }
+
+    /* text-base on phones stops iPhones zooming into the field */
+    .input {
+        @apply block w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-brand-500 focus:ring-3 focus:ring-brand-500/20 focus:outline-none sm:text-sm;
+    }
+
+    .input-error {
+        @apply border-red-500 focus:border-red-500 focus:ring-red-500/20;
+    }
+
+    .field-error {
+        @apply text-sm font-medium text-red-700;
+    }
+
+    .hint {
+        @apply text-sm text-stone-500;
+    }
+
+    .radio-group {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .radio {
+        @apply inline-flex cursor-pointer items-center gap-2 rounded-lg border border-stone-300 bg-white px-3.5 py-2.5 text-sm font-medium text-stone-700 has-checked:border-brand-500 has-checked:bg-brand-50 has-checked:text-brand-800;
+    }
+
+    .checkbox {
+        @apply flex cursor-pointer items-start gap-3 text-sm text-stone-800;
+    }
+
+    .radio input,
+    .checkbox input {
+        @apply size-4 shrink-0 accent-brand-600;
+    }
+
+    .checkbox input {
+        @apply mt-0.5;
+    }
+
+    .checkbox-title {
+        @apply block font-medium;
+    }
+
+    .form-actions {
+        @apply flex flex-col-reverse gap-3 border-t border-stone-200 pt-6 sm:flex-row sm:justify-end;
+    }
+}

@@ -1,0 +1,21 @@
+# Build output
+target/
+
+# Node.js downloaded by Maven, and Tailwind's packages
+node/
+node_modules/
+
+# Local H2 database files
+data/
+
+# IDE and OS files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Logs and local secrets
+*.log
+.env
+.env.*
+.vercel/

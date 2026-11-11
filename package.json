@@ -1,0 +1,16 @@
+{
+  "name": "blood-donation-system",
+  "private": true,
+  "description": "Builds the site's CSS with Tailwind. Maven runs this automatically.",
+  "scripts": {
+    "build:css": "tailwindcss --input src/main/frontend/styles/main.css --output target/classes/static/css/app.css --minify 2>&1",
+    "watch:css": "tailwindcss --input src/main/frontend/styles/main.css --output target/classes/static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.5",
+    "tailwindcss": "4.3.5"
+  },
+  "allowScripts": {
+    "@parcel/watcher": false
+  }
+}

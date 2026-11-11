@@ -1,0 +1,7 @@
+<%-- Bottom bar, included by tags/page.tag --%>
+<footer class="site-footer">
+    <div class="site-footer-inner">
+        <p>Blood Donation Management System</p>
+        <p>MCA project &middot; Group 2</p>
+    </div>
+</footer>

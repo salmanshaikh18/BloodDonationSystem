@@ -1,0 +1,67 @@
+/*
+ * Data tables. On phones and tablets each row becomes a small card, and each
+ * cell shows its column name from data-label="..." in the JSP.
+ */
+@layer components {
+    .data-table-wrap {
+        @apply overflow-x-auto rounded-2xl border border-stone-200 bg-white shadow-card;
+    }
+
+    .data-table {
+        @apply w-full border-collapse text-left text-sm;
+    }
+
+    .data-table th {
+        @apply bg-stone-50 px-4 py-3 text-xs font-semibold tracking-wider whitespace-nowrap text-stone-500 uppercase;
+    }
+
+    .data-table td {
+        @apply border-t border-stone-100 px-4 py-3.5 align-middle;
+    }
+
+    .data-table tbody tr {
+        @apply transition-colors hover:bg-stone-50;
+    }
+
+    .data-table-link {
+        @apply font-semibold text-stone-900 hover:text-brand-700;
+    }
+
+    .data-table-actions {
+        @apply text-right;
+    }
+
+    @media (width < 64rem) {
+        .data-table,
+        .data-table tbody,
+        .data-table tr,
+        .data-table td {
+            @apply block;
+        }
+
+        .data-table thead {
+            @apply sr-only;
+        }
+
+        .data-table tr {
+            @apply border-t border-stone-200 px-4 py-3 first:border-t-0;
+        }
+
+        .data-table td {
+            @apply flex items-center justify-between gap-4 border-0 px-0 py-1.5;
+        }
+
+        .data-table td[data-label]::before {
+            content: attr(data-label);
+            @apply text-xs font-medium text-stone-500;
+        }
+
+        .data-table-actions {
+            @apply pt-2;
+        }
+
+        .data-table-actions .btn {
+            @apply w-full;
+        }
+    }
+}

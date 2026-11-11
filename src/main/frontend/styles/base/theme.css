@@ -1,0 +1,24 @@
+/*
+ * Design tokens. Tailwind turns each variable into classes:
+ * --color-brand-600 gives bg-brand-600, text-brand-600, border-brand-600 ...
+ * Change a value here and the whole site follows.
+ * Greys use Tailwind's built-in "stone" palette.
+ */
+@theme {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+    /* Brand colour: blood red */
+    --color-brand-50: #fef2f2;
+    --color-brand-100: #fde4e4;
+    --color-brand-200: #fbcdcd;
+    --color-brand-300: #f6a6a6;
+    --color-brand-400: #ee7070;
+    --color-brand-500: #e04343;
+    --color-brand-600: #c62828;
+    --color-brand-700: #a61f1f;
+    --color-brand-800: #891d1d;
+    --color-brand-900: #721d1d;
+
+    /* Soft shadow for cards and tiles */
+    --shadow-card: 0 1px 2px 0 rgb(28 25 23 / 0.04), 0 1px 3px 0 rgb(28 25 23 / 0.06);
+}

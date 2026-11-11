@@ -1,0 +1,35 @@
+/*
+ * Stylesheet entry point.
+ * Tailwind joins this file and everything it imports into one minified file,
+ * target/classes/static/css/app.css, which the pages load as /css/app.css.
+ * Run "npm run watch:css" while editing styles to rebuild it on every save.
+ */
+@import "tailwindcss" source(none);
+
+/* Design tokens and plain HTML elements */
+@import "./base/theme.css";
+@import "./base/base.css";
+
+/* Page frame */
+@import "./layout/page.css";
+@import "./layout/header.css";
+@import "./layout/footer.css";
+
+/* Reusable pieces */
+@import "./components/buttons.css";
+@import "./components/cards.css";
+@import "./components/forms.css";
+@import "./components/tables.css";
+@import "./components/badges.css";
+@import "./components/chips.css";
+@import "./components/alerts.css";
+
+/* Styles used by a single page */
+@import "./pages/home.css";
+@import "./pages/donors.css";
+@import "./pages/search.css";
+@import "./pages/error.css";
+
+/* Where Tailwind looks for class names */
+@source "../../webapp/WEB-INF";
+@source "../../resources/static/js";

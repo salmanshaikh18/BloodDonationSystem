@@ -1,0 +1,43 @@
+/* Page width, page headings and space between sections */
+@layer components {
+    .page {
+        @apply mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:py-12;
+    }
+
+    .page-header {
+        @apply mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between;
+    }
+
+    .page-title {
+        @apply text-2xl font-bold text-stone-900 sm:text-3xl;
+    }
+
+    .page-subtitle {
+        @apply mt-1.5 text-stone-600;
+    }
+
+    .section {
+        @apply mt-12;
+    }
+
+    .section-header {
+        @apply mb-4 flex items-baseline justify-between gap-4;
+    }
+
+    .section-title {
+        @apply text-lg font-semibold text-stone-900;
+    }
+
+    .section-link {
+        @apply text-sm font-medium;
+    }
+
+    .back-link {
+        @apply mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-900;
+    }
+
+    /* Lets keyboard users jump past the menu */
+    .skip-link {
+        @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-stone-900 focus:shadow-lg;
+    }
+}

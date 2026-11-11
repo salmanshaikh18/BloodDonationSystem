@@ -1,0 +1,39 @@
+/* Blood group pills, donor status and the "Same group / Compatible" label */
+@layer components {
+    .blood-badge {
+        @apply inline-flex min-w-12 shrink-0 items-center justify-center rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700 ring-1 ring-brand-200 ring-inset;
+    }
+
+    .blood-badge-lg {
+        @apply size-16 rounded-2xl bg-brand-600 p-0 text-xl text-white ring-0;
+    }
+
+    .status {
+        @apply inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap;
+    }
+
+    .status::before {
+        content: "";
+        @apply size-1.5 rounded-full bg-current;
+    }
+
+    .status-ready {
+        @apply bg-emerald-50 text-emerald-700;
+    }
+
+    .status-waiting {
+        @apply bg-amber-50 text-amber-800;
+    }
+
+    .status-off {
+        @apply bg-stone-100 text-stone-600;
+    }
+
+    .match-tag {
+        @apply rounded-md bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-600;
+    }
+
+    .match-tag-exact {
+        @apply bg-brand-50 text-brand-700;
+    }
+}
