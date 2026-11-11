@@ -129,8 +129,9 @@ None of these steps need a credit card.
 
 Tips:
 
-- **Region:** put the app and the database close together. For India, choose Singapore for
-  the Neon database and set Vercel's function region (Settings → Functions) to Singapore too.
+- **Region:** `vercel.json` runs the app in Singapore (`sin1`), so create the Neon database in
+  Singapore too (AWS ap-southeast-1). If they are far apart, every page waits on the database
+  and the app may not start within Vercel's time limit.
 - **Sample donors on the live site:** add the environment variable `APP_SAMPLE_DATA` = `true`
   in Vercel and redeploy. They are only added while the database is empty.
 - **Sleeping:** the free site shuts down after a few minutes without visitors. The next visit
